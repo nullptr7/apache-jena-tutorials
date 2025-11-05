@@ -1,9 +1,7 @@
 package com.github.nullptr7.jenademo
 
 import org.apache.jena.fuseki.main.FusekiServer
-import org.apache.jena.query.{ Dataset, DatasetFactory }
-
-import org.apache.jena.query.{ Dataset, QueryExecutionFactory, QueryFactory, ReadWrite, ResultSetFormatter }
+import org.apache.jena.query.*
 import org.apache.jena.rdf.model.{ Model, ResourceFactory, StmtIterator }
 import org.apache.jena.tdb2.TDB2Factory
 

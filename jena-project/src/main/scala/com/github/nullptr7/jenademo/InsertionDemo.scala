@@ -1,7 +1,7 @@
 package com.github.nullptr7.jenademo
 
 import org.apache.jena.query.{ Dataset, ReadWrite }
-import org.apache.jena.rdf.model.{ Model, Property, RDFNode, Resource, ResourceFactory, Statement }
+import org.apache.jena.rdf.model.*
 import org.apache.jena.tdb2.TDB2Factory
 
 import java.nio.file.{ Files, Paths }

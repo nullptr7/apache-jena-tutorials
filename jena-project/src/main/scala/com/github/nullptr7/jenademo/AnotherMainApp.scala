@@ -4,13 +4,13 @@ import org.apache.jena.query.{ Dataset, ReadWrite }
 import org.apache.jena.rdf.model.*
 import org.apache.jena.tdb2.TDB2Factory
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters.*
 
 object AnotherMainApp extends App {
 
   // Optional: if you really need Jena's Seq somewhere, alias it like this:
   // import org.apache.jena.rdf.model.{Seq as JenaSeq}
-  object TDB2DataAccess:
+  private object TDB2DataAccess:
     private val storeDir = "D:\\softwares\\apache-jena-fuseki-5.6.0\\db"
     private val dataset: Dataset = TDB2Factory.connectDataset(storeDir)
 
@@ -46,7 +46,7 @@ object AnotherMainApp extends App {
     else println(s"Objects for subject: <$subject> & predicate: <$predicate> --> <${obj.asResource.getURI}>")
   }
 
-  val objValue = "jaz@in.com"
+  private val objValue = "jaz@in.com"
   TDB2DataAccess.SubjectDataAccess(predicate, objValue).foreach { subj =>
     println(s"Subjects for predicate: <$predicate> object: $objValue --> <${subj.getURI}>")
   }
