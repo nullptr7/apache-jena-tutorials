@@ -79,7 +79,7 @@ object InsertionDemo extends App {
   private def insertStatements(graphIri: String, statements: List[Statement]): Int =
     if statements.isEmpty then return 0
 
-    Files.createDirectories(Paths.get(STORE_DIR))
+    // Files.createDirectories(Paths.get(STORE_DIR))
     val dataset: Dataset = TDB2Factory.connectDataset(STORE_DIR)
 
     dataset.begin(ReadWrite.WRITE)
@@ -102,9 +102,9 @@ object InsertionDemo extends App {
       dataset.close()
 
   // -------------- entrypoint --------------
-  def run(): Unit =
-    val stmts = readStatementsFromFile(TEMP_FILE, SUBJECT_IRI)
-    val n     = insertStatements(GRAPH_IRI, stmts)
+  private def run(): Unit =
+    val stmts: List[Statement] = readStatementsFromFile(TEMP_FILE, SUBJECT_IRI)
+    val n:     Int             = insertStatements(GRAPH_IRI, stmts)
     println(s"Inserted $n statements into graph <$GRAPH_IRI> at $STORE_DIR")
 
   run()
