@@ -14,6 +14,6 @@ object StreamInsert extends IOApp.Simple {
   private val tripleInsertionService: TripleInsertionService =
     new TripleInsertionService(Path("C:\\Users\\User\\Desktop\\pp\\triples_10m.csv"), logic)
 
-  override def run: IO[Unit] = tripleInsertionService.doExecute
+  override def run: IO[Unit] = IO.delay(logic.compat())
 
 }

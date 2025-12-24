@@ -5,6 +5,7 @@ import com.github.nullptr7.streamer.{ InsertLogic, Triple }
 import fs2.Chunk
 import org.apache.jena.query.{ Dataset, ReadWrite }
 import org.apache.jena.rdf.model.{ ResourceFactory, Statement }
+import org.apache.jena.tdb2.DatabaseMgr
 
 final class ApacheJenaInsertionLogic(val dataset: Dataset, graphIri: String) extends InsertLogic {
   private var count: Long = 0L
@@ -37,6 +38,13 @@ final class ApacheJenaInsertionLogic(val dataset: Dataset, graphIri: String) ext
       commit()
       close()
     }
+
+  def compat(): Unit = {
+//    dataset.begin(ReadWrite.READ)
+    DatabaseMgr.compact(dataset.asDatasetGraph(), true)
+//    commit()
+//    close()
+  }
 
   private def begin(): Unit = dataset.begin(ReadWrite.WRITE)
 

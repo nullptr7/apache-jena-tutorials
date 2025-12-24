@@ -1,59 +1,30 @@
 package com.github.nullptr7.blazegraphdemo
 
-import java.util.Properties
-import org.openrdf.OpenRDFException
-import org.openrdf.model.Literal
-import org.openrdf.model.Statement
-import org.openrdf.model.impl.LiteralImpl
-import org.openrdf.model.impl.StatementImpl
-import org.openrdf.model.impl.URIImpl
-import org.openrdf.query.BindingSet
-import org.openrdf.query.QueryLanguage
-import org.openrdf.query.TupleQuery
-import org.openrdf.query.TupleQueryResult
-import org.openrdf.repository.Repository
-import org.openrdf.repository.RepositoryConnection
+import cats.effect.{ IO, IOApp }
 import com.bigdata.journal.Options
-import com.bigdata.rdf.sail.BigdataSail
-import com.bigdata.rdf.sail.BigdataSailRepository
+import com.bigdata.rdf.sail.{ BigdataSail, BigdataSailRepository }
+import com.github.nullptr7.streamer.TripleInsertionService
+import fs2.io.file.Path
 
-object BlazegraphMainApp extends App {
-  val props = new Properties
-  props.put(Options.BUFFER_MODE, "DiskRW") // persistent file system located journal
+import java.util
+import scala.concurrent.duration.{ Duration, DurationInt }
 
-  props.put(Options.FILE, "D:\\softwares\\blazegraph\\database.jnl") // journal file location
+object BlazegraphMainApp extends IOApp.Simple {
+  val properties = new util.Properties
 
-  val sail = new BigdataSail(props) // instantiate a sail
+  properties.put(Options.BUFFER_MODE, "DiskRW")
+  properties.put(Options.FILE, "D:\\softwares\\blazegraph\\database.jnl")
 
-  val repo = new BigdataSailRepository(sail) // create a Sesame repository
-
-  val subject   = new URIImpl("http://blazegraph.com/Blazegraph")
-  val predicate = new URIImpl("http://blazegraph.com/says")
-  val `object`  = new LiteralImpl("hello")
-  val stmt      = new StatementImpl(subject, predicate, `object`)
-
-  // open repository connection
-  val cxn = repo.getConnection
-
-  try {
-    cxn.begin
-    cxn.add(stmt)
-    cxn.commit
-  }
-  catch {
-    case ex: OpenRDFException =>
-      cxn.rollback
-      throw ex
-  }
-  finally
-    cxn.close
-
-  // open connection
-//  if (repo.isInstanceOf[BigdataSailRepository]) cxn = repo.asInstanceOf[BigdataSailRepository].getReadOnlyConnection
-//  else cxn                                          = repo.getConnection
-
-
-
-  println("Hello Blazegraph!")
+  override def run: IO[Unit] =
+    for {
+      repo  <- IO.blocking(new BigdataSailRepository(new BigdataSail(properties)))
+      conn  <- IO.blocking { repo.initialize(); repo.getConnection }
+      logic <- IO.blocking(BlazegraphInsertionLogic(conn))
+      _     <- IO.println("Starting execution")
+//      _     <- IO.sleep(10.seconds)
+      serv  <- IO.pure(TripleInsertionService(Path("C:\\Users\\User\\Desktop\\pp\\triples_10m.csv"), logic))
+      _     <- serv.doExecute
+      _     <- IO.delay(conn.close())
+    } yield ()
 
 }
